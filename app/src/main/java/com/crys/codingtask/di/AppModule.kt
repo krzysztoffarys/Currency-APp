@@ -4,6 +4,8 @@ import android.content.Context
 import com.crys.codingtask.data.CurrencyApi
 import com.crys.codingtask.other.Constants.BASE_URL
 import com.crys.codingtask.other.InternetChecker
+import com.crys.codingtask.repositories.DefaultRepository
+import com.crys.codingtask.repositories.Repository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -52,6 +54,12 @@ object AppModule {
     fun provideInternetChecker(
         @ApplicationContext context: Context
     ) = InternetChecker(context)
+
+    @Provides
+    @Singleton
+    fun provideDefaultRepository(
+        api: CurrencyApi
+    ) = DefaultRepository(api) as Repository
 
 }
 
