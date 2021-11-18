@@ -1,18 +1,32 @@
 package com.crys.codingtask.ui.rate
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.crys.codingtask.R
 import com.crys.codingtask.adapters.CurrencyItemAdapter
 import com.crys.codingtask.databinding.RateFragmentBinding
+import com.crys.codingtask.other.Constants.AMOUNT_ITEM_TO_PAGINATION
 import com.crys.codingtask.other.InternetChecker
 import com.crys.codingtask.other.Status
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
+import java.text.DateFormat.getDateInstance
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.*
 import javax.inject.Inject
+import java.util.Locale
+
+
+
 
 @AndroidEntryPoint
 class RateFragment : Fragment(R.layout.rate_fragment) {
@@ -23,13 +37,18 @@ class RateFragment : Fragment(R.layout.rate_fragment) {
     lateinit var internetChecker: InternetChecker
     private lateinit var currencyAdapter: CurrencyItemAdapter
 
+    //variables for pagination
+    private var isLoading = false
+    private var itemAmount = 0
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = RateFragmentBinding.bind(view)
         viewModel.getLatestResponse()
         subscribeToObservers()
         setupRecyclerView()
-
     }
 
     //
@@ -38,14 +57,20 @@ class RateFragment : Fragment(R.layout.rate_fragment) {
             val result = event.peekContent()
             when(result.status) {
                 Status.SUCCESS -> {
+                    isLoading = false
                     binding.progressBar.visibility = View.GONE
                     currencyAdapter.currencyList = result.data!!
+                    //we tell the adapter to ui update
+                    currencyAdapter.notifyItemRangeChanged(itemAmount, result.data.size - 1)
+                    itemAmount = result.data.size
                 }
                 Status.ERROR -> {
+                    isLoading = false
                     binding.progressBar.visibility = View.GONE
                     event.getContentIfNotHandled()?.message?.let { message -> showSnackBar(message) }
                 }
                 Status.LOADING -> {
+                    isLoading = true
                     binding.progressBar.visibility = View.VISIBLE
                 }
             }
@@ -64,5 +89,20 @@ class RateFragment : Fragment(R.layout.rate_fragment) {
         currencyAdapter = CurrencyItemAdapter()
         adapter = currencyAdapter
         layoutManager = LinearLayoutManager(requireContext())
+        addOnScrollListener(scrollListener)
+    }
+
+    //pagination
+    private val scrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+            val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+            val totalItemCount = layoutManager.itemCount
+            if (totalItemCount - firstVisibleItemPosition < AMOUNT_ITEM_TO_PAGINATION && !isLoading) {
+                isLoading = true
+                viewModel.selectedDateResponse()
+            }
+        }
     }
 }
