@@ -8,6 +8,9 @@ import com.crys.codingtask.other.Resource
 class FakeRepository : Repository {
 
     private var shouldReturnNetworkError = false
+    fun setShouldReturnNetworkError(value: Boolean) {
+        shouldReturnNetworkError = value
+    }
 
     override suspend fun getLatestResponse(): Resource<LatestResponse> {
         return if(shouldReturnNetworkError) {

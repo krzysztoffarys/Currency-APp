@@ -6,13 +6,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.crys.codingtask.R
+import com.crys.codingtask.adapters.CurrencyItemAdapter
 import com.crys.codingtask.databinding.RateFragmentBinding
-import com.crys.codingtask.other.Converter.ratesToListOfCurrency
 import com.crys.codingtask.other.InternetChecker
 import com.crys.codingtask.other.Status
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -27,32 +26,27 @@ class RateFragment : Fragment(R.layout.rate_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = RateFragmentBinding.bind(view)
-
+        viewModel.getLatestResponse()
         subscribeToObservers()
         setupRecyclerView()
-        viewModel
+
     }
 
     //
     private fun subscribeToObservers() {
-        internetChecker.observe(viewLifecycleOwner, {
-            viewModel.isInternetConnection = it
-        })
-        viewModel.latestResponse.observe( viewLifecycleOwner, {
-            val result = it.peekContent()
+        viewModel.result.observe(viewLifecycleOwner, { event ->
+            val result = event.peekContent()
             when(result.status) {
                 Status.SUCCESS -> {
-                    Timber.d(result.data?.date)
-                    val rates = result.data!!.rates
-                    val items = ratesToListOfCurrency(rates!!, result.data.date!!)
-                    currencyAdapter.currencyList = items
-
+                    binding.progressBar.visibility = View.GONE
+                    currencyAdapter.currencyList = result.data!!
                 }
                 Status.ERROR -> {
-                    it.getContentIfNotHandled()?.message?.let { message -> showSnackBar(message) }
+                    binding.progressBar.visibility = View.GONE
+                    event.getContentIfNotHandled()?.message?.let { message -> showSnackBar(message) }
                 }
                 Status.LOADING -> {
-                    //
+                    binding.progressBar.visibility = View.VISIBLE
                 }
             }
         })

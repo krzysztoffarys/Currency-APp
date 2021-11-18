@@ -7,13 +7,13 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 data class LatestResponse(
     @Json(name = "base")
-    val base: String?,
+    val base: String,
     @Json(name = "date")
-    val date: String?,
+    val date: String,
     @Json(name = "rates")
-    val rates: Rates?,
+    val rates: Rates,
     @Json(name = "success")
-    val success: Boolean?,
+    val success: Boolean,
     @Json(name = "timestamp")
-    val timestamp: Int?
+    val timestamp: Int
 )
