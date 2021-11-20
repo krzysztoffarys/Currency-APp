@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.crys.codingtask.data.model.Currency
 import com.crys.codingtask.data.model.LatestResponse
 import com.crys.codingtask.data.model.SelectedDateResponse
+import com.crys.codingtask.model.CurrencyRecyclerViewItem
 import com.crys.codingtask.other.Converter.ratesToListOfCurrency
 import com.crys.codingtask.other.Event
 import com.crys.codingtask.other.Resource
@@ -23,10 +23,10 @@ class RateViewModel @Inject constructor(
     private val repository: Repository
 ): ViewModel() {
 
-    private val _result = MutableLiveData<Event<Resource<List<Currency>>>>()
-    val result : LiveData<Event<Resource<List<Currency>>>> = _result
+    private val _result = MutableLiveData<Event<Resource<List<CurrencyRecyclerViewItem>>>>()
+    val result : LiveData<Event<Resource<List<CurrencyRecyclerViewItem>>>> = _result
 
-    private val currencyList = mutableListOf<Currency>()
+    private val currencyList = mutableListOf<CurrencyRecyclerViewItem>()
     private var lastDate = ""
 
     fun getLatestResponse() = viewModelScope.launch {

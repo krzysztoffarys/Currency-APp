@@ -1,69 +1,64 @@
 package com.crys.codingtask.adapters
 
-import android.graphics.Color
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.crys.codingtask.data.model.Currency
+import com.crys.codingtask.R
+import com.crys.codingtask.model.CurrencyRecyclerViewHolder
+import com.crys.codingtask.model.CurrencyRecyclerViewItem
 import com.crys.codingtask.databinding.ItemCurrencyBinding
-import timber.log.Timber
+import com.crys.codingtask.databinding.ItemDateBinding
 
-class CurrencyItemAdapter : RecyclerView.Adapter<CurrencyItemAdapter.CurrencyViewHolder>() {
-    inner class CurrencyViewHolder(val binding: ItemCurrencyBinding) : RecyclerView.ViewHolder(binding.root)
+class CurrencyItemAdapter(val context: Context) : RecyclerView.Adapter<CurrencyRecyclerViewHolder>() {
 
-    private val diffCallback = object : DiffUtil.ItemCallback<Currency>() {
-        override fun areItemsTheSame(oldItem: Currency, newItem: Currency): Boolean {
-            return oldItem.name == newItem.name && oldItem.date == newItem.date
+    private var onItemClickListener: ((CurrencyRecyclerViewItem.Currency) -> Unit)? = null
+
+
+    var items = listOf<CurrencyRecyclerViewItem>()
+
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyRecyclerViewHolder {
+        return when(viewType) {
+            R.layout.item_currency -> CurrencyRecyclerViewHolder.CurrencyViewHolder(
+                ItemCurrencyBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                ),
+                context,
+                onItemClickListener
+            )
+            R.layout.item_date -> CurrencyRecyclerViewHolder.DateViewHolder(
+                ItemDateBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+            else -> throw IllegalArgumentException("Invalid ViewType Provided")
         }
+    }
 
-        override fun areContentsTheSame(oldItem: Currency, newItem: Currency): Boolean {
-            return oldItem.amount == newItem.amount && oldItem.date == newItem.date
+    override fun onBindViewHolder(holder: CurrencyRecyclerViewHolder, position: Int) {
+        when (holder){
+            is CurrencyRecyclerViewHolder.CurrencyViewHolder -> holder.bind(items[position] as CurrencyRecyclerViewItem.Currency)
+            is CurrencyRecyclerViewHolder.DateViewHolder -> holder.bind(items[position] as CurrencyRecyclerViewItem.Date)
         }
     }
 
-    private var onItemClickListener: ((Currency) -> Unit)? = null
+    override fun getItemCount(): Int = items.size
 
-    private val differ = AsyncListDiffer(this, diffCallback)
-
-    var currencyList: List<Currency>
-        get() = differ.currentList
-        set(value) = differ.submitList(value)
-
-
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CurrencyViewHolder {
-        val binding = ItemCurrencyBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return CurrencyViewHolder(binding)
-    }
-
-    override fun onBindViewHolder(holder: CurrencyViewHolder, position: Int) {
-        val curCurrency = currencyList[position]
-        holder.binding.apply {
-
-            if(curCurrency.name == "date") {
-                tvName.text = ""
-                tvAmount.text = ""
-                tvDate.text = curCurrency.date
-            } else {
-                tvName.text = curCurrency.name.uppercase()
-                tvAmount.text = curCurrency.amount.toString()
-                tvDate.text = ""
-            }
+    override fun getItemViewType(position: Int): Int {
+        return when(items[position]){
+            is CurrencyRecyclerViewItem.Currency -> R.layout.item_currency
+            is CurrencyRecyclerViewItem.Date -> R.layout.item_date
         }
-
     }
 
-    override fun getItemCount(): Int {
-        return currencyList.size
-    }
-
-    fun setOnItemClickListener(onItemClick: (Currency) -> Unit) {
+    fun setOnItemClickListener(onItemClick: (CurrencyRecyclerViewItem.Currency) -> Unit) {
         this.onItemClickListener = onItemClick
     }
 }
