@@ -6,6 +6,7 @@ import androidx.viewbinding.ViewBinding
 import com.crys.codingtask.R
 import com.crys.codingtask.databinding.ItemCurrencyBinding
 import com.crys.codingtask.databinding.ItemDateBinding
+import com.crys.codingtask.other.Converter.roundCurrency
 
 sealed class CurrencyRecyclerViewHolder(binding: ViewBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -13,8 +14,10 @@ sealed class CurrencyRecyclerViewHolder(binding: ViewBinding) : RecyclerView.Vie
         fun bind(currency: CurrencyRecyclerViewItem.Currency) {
 
             binding.apply {
-                tvName.text = currency.name.uppercase()
-                tvAmount.text = currency.amount.toString()
+
+                val name = currency.name.uppercase()
+                tvName.text = name
+                tvAmount.text = roundCurrency(currency.amount).toString()
                 try {
                     val image = context.resources.getIdentifier("${currency.name.lowercase()}_flag", "drawable", context.packageName)
                     //if image found

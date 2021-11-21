@@ -2,9 +2,12 @@ package com.crys.codingtask.other
 
 import com.crys.codingtask.model.CurrencyRecyclerViewItem
 import com.crys.codingtask.data.model.Rates
+import kotlin.math.roundToInt
 
 
 object Converter {
+
+    val popularCurrency = mutableListOf<CurrencyRecyclerViewItem.Currency>()
 
     fun ratesToListOfCurrency(rates: Rates, date: String) : List<CurrencyRecyclerViewItem> {
         val list = mutableListOf<CurrencyRecyclerViewItem>()
@@ -43,7 +46,10 @@ object Converter {
         if (rates.cHF != null) list.add(CurrencyRecyclerViewItem.Currency("cHF", rates.cHF, date))
         if (rates.cLF != null) list.add(CurrencyRecyclerViewItem.Currency("cLF", rates.cLF, date))
         if (rates.cLP != null) list.add(CurrencyRecyclerViewItem.Currency("cLP", rates.cLP, date))
-        if (rates.cNY != null) list.add(CurrencyRecyclerViewItem.Currency("cNY", rates.cNY, date))
+        if (rates.cNY != null) {
+            list.add(CurrencyRecyclerViewItem.Currency("cNY", rates.cNY, date))
+            popularCurrency.add(CurrencyRecyclerViewItem.Currency("cNY", rates.cNY, date))
+        }
         if (rates.cOP != null) list.add(CurrencyRecyclerViewItem.Currency("cOP", rates.cOP, date))
         if (rates.cRC != null) list.add(CurrencyRecyclerViewItem.Currency("cRC", rates.cRC, date))
         if (rates.cUC != null) list.add(CurrencyRecyclerViewItem.Currency("cUC", rates.cUC, date))
@@ -57,7 +63,10 @@ object Converter {
         if (rates.eGP != null) list.add(CurrencyRecyclerViewItem.Currency("eGP", rates.eGP, date))
         if (rates.eRN != null) list.add(CurrencyRecyclerViewItem.Currency("eRN", rates.eRN, date))
         if (rates.eTB != null) list.add(CurrencyRecyclerViewItem.Currency("eTB", rates.eTB, date))
-        if (rates.eUR != null) list.add(CurrencyRecyclerViewItem.Currency("eUR", rates.eUR.toDouble(), date))
+        if (rates.eUR != null) {
+            list.add(CurrencyRecyclerViewItem.Currency("eUR", rates.eUR.toDouble(), date))
+            popularCurrency.add(CurrencyRecyclerViewItem.Currency("eUR", rates.eUR.toDouble(), date))
+        }
         if (rates.fJD != null) list.add(CurrencyRecyclerViewItem.Currency("fJD", rates.fJD, date))
         if (rates.fKP != null) list.add(CurrencyRecyclerViewItem.Currency("fKP", rates.fKP, date))
         if (rates.gBP != null) list.add(CurrencyRecyclerViewItem.Currency("gBP", rates.gBP, date))
@@ -128,7 +137,10 @@ object Converter {
         if (rates.pGK != null) list.add(CurrencyRecyclerViewItem.Currency("pGK", rates.pGK, date))
         if (rates.pHP != null) list.add(CurrencyRecyclerViewItem.Currency("pHP", rates.pHP, date))
         if (rates.pKR != null) list.add(CurrencyRecyclerViewItem.Currency("pKR", rates.pKR, date))
-        if (rates.pLN != null) list.add(CurrencyRecyclerViewItem.Currency("pLN", rates.pLN, date))
+        if (rates.pLN != null) {
+            list.add(CurrencyRecyclerViewItem.Currency("pLN", rates.pLN, date))
+            popularCurrency.add(CurrencyRecyclerViewItem.Currency("pLN", rates.pLN, date))
+        }
         if (rates.pYG != null) list.add(CurrencyRecyclerViewItem.Currency("pYG", rates.pYG, date))
         if (rates.qAR != null) list.add(CurrencyRecyclerViewItem.Currency("qAR", rates.qAR, date))
         if (rates.rON != null) list.add(CurrencyRecyclerViewItem.Currency("rON", rates.rON, date))
@@ -160,7 +172,10 @@ object Converter {
         if (rates.tZS != null) list.add(CurrencyRecyclerViewItem.Currency("tZS", rates.tZS, date))
         if (rates.uAH != null) list.add(CurrencyRecyclerViewItem.Currency("uAH", rates.uAH, date))
         if (rates.uGX != null) list.add(CurrencyRecyclerViewItem.Currency("uGX", rates.uGX, date))
-        if (rates.uSD != null) list.add(CurrencyRecyclerViewItem.Currency("uSD", rates.uSD, date))
+        if (rates.uSD != null) {
+            list.add(CurrencyRecyclerViewItem.Currency("uSD", rates.uSD, date))
+            popularCurrency.add(CurrencyRecyclerViewItem.Currency("uSD", rates.uSD, date))
+        }
         if (rates.uYU != null) list.add(CurrencyRecyclerViewItem.Currency("uYU", rates.uYU, date))
         if (rates.uZS != null) list.add(CurrencyRecyclerViewItem.Currency("uZS", rates.uZS, date))
         if (rates.vEF != null) list.add(CurrencyRecyclerViewItem.Currency("vEF", rates.vEF, date))
@@ -181,5 +196,9 @@ object Converter {
         if (rates.zWL != null) list.add(CurrencyRecyclerViewItem.Currency("zWL", rates.zWL, date))
 
         return list
+    }
+    //round double to 5 digits
+    fun roundCurrency(number: Double) : Double {
+        return (number * 100000.0).roundToInt() / 100000.0
     }
 }

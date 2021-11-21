@@ -3,14 +3,12 @@ package com.crys.codingtask.adapters
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AsyncListDiffer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.crys.codingtask.R
-import com.crys.codingtask.model.CurrencyRecyclerViewHolder
-import com.crys.codingtask.model.CurrencyRecyclerViewItem
 import com.crys.codingtask.databinding.ItemCurrencyBinding
 import com.crys.codingtask.databinding.ItemDateBinding
+import com.crys.codingtask.model.CurrencyRecyclerViewHolder
+import com.crys.codingtask.model.CurrencyRecyclerViewItem
 
 class CurrencyItemAdapter(val context: Context) : RecyclerView.Adapter<CurrencyRecyclerViewHolder>() {
 

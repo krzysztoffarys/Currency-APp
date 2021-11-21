@@ -3,7 +3,9 @@ package com.crys.codingtask.ui.detail
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.crys.codingtask.R
@@ -18,12 +20,24 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
     private var currencyName = ""
     private var amount = 0.0
     private var date = ""
+    private val viewModel: DetailViewModel by viewModels()
+    private lateinit var customAdapterLeft: CustomSpinnerAdapter
+    private lateinit var customAdapterRight: CustomSpinnerAdapter
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = DetailFragmentBinding.bind(view)
         setupLayout()
+        subscribeToObservers()
     }
+
+    private fun subscribeToObservers() {
+        viewModel.result.observe(viewLifecycleOwner, { text ->
+            binding.tvResult.text = text
+        })
+    }
+
 
     private fun setupLayout() {
         currencyName = args.currency.name.uppercase()
@@ -36,39 +50,51 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
                     DetailFragmentDirections.actionDetailFragmentToRateFragment()
                 )
             }
+
+            ivChange.setOnClickListener {
+                swapSpinner()
+            }
+
+            btnConvert.setOnClickListener {
+                try {
+                    if (etAmount.text.isEmpty()) {
+                        val emptyMessage = getString(R.string.empty_field)
+                        Toast.makeText(requireContext(), emptyMessage, Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    val number = etAmount.text.toString().toDouble()
+                    viewModel.calculate(number)
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), e.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+
         }
         setupSpinner()
+        viewModel.getCurrency(date, amount)
+        viewModel.calculate(1.0)
     }
     private fun setupSpinner() {
 
-        val list = mutableListOf(
-            CustomSpinnerItem(R.drawable.eur_flag, "EUR"),
-            CustomSpinnerItem(R.drawable.pln_flag, "PLN"),
-            CustomSpinnerItem(R.drawable.cny_flag, "CNY"),
-            CustomSpinnerItem(R.drawable.usd_flag, "USD")
-        )
-
-        if (currencyName == "EUR" || currencyName == "PLN" || currencyName == "CNY" || currencyName == "USD") {
-            list.add(CustomSpinnerItem(R.drawable.gbp_flag, "GBP"),)
-        } else {
-            val placeholder = requireContext().resources.getIdentifier("placeholder_flag",
+        val placeholder = requireContext().resources.getIdentifier("placeholder_flag",
+            "drawable", requireContext().packageName)
+        try {
+            val image = requireContext().resources.getIdentifier("${currencyName.lowercase()}_flag",
                 "drawable", requireContext().packageName)
-            try {
-                val image = requireContext().resources.getIdentifier("${currencyName.lowercase()}_flag",
-                    "drawable", requireContext().packageName)
-                if (image != 0) {
-                    list.add(CustomSpinnerItem(image, currencyName))
-                } else {
-                    list.add(CustomSpinnerItem(placeholder, currencyName))
-                }
-            } catch (e: Exception) {
-                list.add(CustomSpinnerItem(placeholder, currencyName))
+            if (image != 0) {
+                viewModel.addToList(CustomSpinnerItem(image, currencyName))
+            } else {
+                viewModel.addToList(CustomSpinnerItem(placeholder, currencyName))
             }
+        } catch (e: Exception) {
+            viewModel.addToList(CustomSpinnerItem(placeholder, currencyName))
         }
 
+
         binding.spinnerLeft.apply {
-            val customAdapter = CustomSpinnerAdapter(requireContext(), list)
-            adapter = customAdapter
+            //current currency on top
+            customAdapterLeft = CustomSpinnerAdapter(requireContext(), viewModel.provideList(false))
+            adapter = customAdapterLeft
 
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -77,20 +103,25 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
                     position: Int,
                     id: Long
                 ) {
-                    val selectedItem = parent?.getItemAtPosition(position) as CustomSpinnerItem
+                    if (!viewModel.isRightMainSpinner) {
+                        viewModel.selectedSpinnerItem = position
+                        if (binding.etAmount.text.isEmpty()) {
+                            viewModel.calculate(1.0)
+                        } else {
+                            val number = binding.etAmount.text.toString().toDouble()
+                            viewModel.calculate(number)
+                        }
+                    }
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    //
-                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
 
         }
 
         binding.spinnerRight.apply {
-            val customAdapter = CustomSpinnerAdapter(requireContext(), list)
-            adapter = customAdapter
-
+            customAdapterRight = CustomSpinnerAdapter(requireContext(), viewModel.provideList(true))
+            adapter = customAdapterRight
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
                     parent: AdapterView<*>?,
@@ -98,16 +129,35 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
                     position: Int,
                     id: Long
                 ) {
-                    val selectedItem = parent?.getItemAtPosition(position) as CustomSpinnerItem
+                    if (viewModel.isRightMainSpinner) {
+                        viewModel.selectedSpinnerItem = position
+                        if (binding.etAmount.text.isEmpty()) {
+                            viewModel.calculate(1.0)
+                        } else {
+                            val number = binding.etAmount.text.toString().toDouble()
+                            viewModel.calculate(number)
+                        }
+                    }
                 }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                    //
-                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
 
         }
     }
 
+    private fun swapSpinner() {
+        if (viewModel.isRightMainSpinner) {
+            binding.spinnerLeft.adapter = customAdapterRight
+            binding.spinnerRight.adapter = customAdapterLeft
+            binding.spinnerLeft.setSelection(viewModel.selectedSpinnerItem)
+            viewModel.isRightMainSpinner = false
+        } else {
+            binding.spinnerLeft.adapter = customAdapterLeft
+            binding.spinnerRight.adapter = customAdapterRight
+            binding.spinnerRight.setSelection(viewModel.selectedSpinnerItem)
+            viewModel.isRightMainSpinner = true
+        }
+    }
 
 }
