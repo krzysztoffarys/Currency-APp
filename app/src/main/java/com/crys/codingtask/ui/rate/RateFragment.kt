@@ -2,10 +2,9 @@ package com.crys.codingtask.ui.rate
 
 import android.os.Bundle
 import android.view.View
-import android.view.animation.AnimationUtils
-import android.view.animation.LayoutAnimationController
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -41,8 +40,15 @@ class RateFragment : Fragment(R.layout.rate_fragment) {
         subscribeToObservers()
         setupRecyclerView()
         currencyAdapter.setOnItemClickListener {
+            val navOptions =  NavOptions.Builder()
+                .setEnterAnim(R.anim.slide_in_right)
+                .setExitAnim(R.anim.slide_out_left)
+                .setPopEnterAnim(R.anim.slide_in_left)
+                .setPopExitAnim(R.anim.slide_out_right)
+                .build()
             findNavController().navigate(
-                RateFragmentDirections.actionRateFragmentToDetailFragment(it)
+                RateFragmentDirections.actionRateFragmentToDetailFragment(it),
+                navOptions
             )
         }
 

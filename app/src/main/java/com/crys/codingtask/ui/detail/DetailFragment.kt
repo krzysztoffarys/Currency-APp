@@ -1,5 +1,6 @@
 package com.crys.codingtask.ui.detail
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -12,6 +13,7 @@ import com.crys.codingtask.R
 import com.crys.codingtask.adapters.CustomSpinnerAdapter
 import com.crys.codingtask.databinding.DetailFragmentBinding
 import com.crys.codingtask.model.CustomSpinnerItem
+import com.crys.codingtask.other.Constants.ANIMATION_DURATION_SPINNER
 import com.crys.codingtask.other.Converter.stringToDate
 
 class DetailFragment : Fragment(R.layout.detail_fragment) {
@@ -146,6 +148,7 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
     }
 
     private fun swapSpinner() {
+        rotate()
         if (viewModel.isRightMainSpinner) {
             binding.spinnerLeft.adapter = customAdapterRight
             binding.spinnerRight.adapter = customAdapterLeft
@@ -157,6 +160,12 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
             binding.spinnerRight.setSelection(viewModel.selectedSpinnerItem)
             viewModel.isRightMainSpinner = true
         }
+    }
+
+    private fun rotate() {
+        ObjectAnimator.ofFloat(binding.ivChange, "rotationY", 0F, 180F)
+            .setDuration(ANIMATION_DURATION_SPINNER)
+            .start()
     }
 
 }
