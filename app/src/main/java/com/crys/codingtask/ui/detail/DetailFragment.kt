@@ -12,6 +12,7 @@ import com.crys.codingtask.R
 import com.crys.codingtask.adapters.CustomSpinnerAdapter
 import com.crys.codingtask.databinding.DetailFragmentBinding
 import com.crys.codingtask.model.CustomSpinnerItem
+import com.crys.codingtask.other.Converter.stringToDate
 
 class DetailFragment : Fragment(R.layout.detail_fragment) {
 
@@ -44,7 +45,7 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
         amount = args.currency.amount
         date = args.currency.date
         binding.apply {
-            tvInfo.text = date
+            tvInfo.text = stringToDate(date, requireContext())
             ivCross.setOnClickListener {
                 findNavController().navigate(
                     DetailFragmentDirections.actionDetailFragmentToRateFragment()

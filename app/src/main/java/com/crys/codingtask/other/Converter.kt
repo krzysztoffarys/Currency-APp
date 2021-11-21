@@ -1,7 +1,10 @@
 package com.crys.codingtask.other
 
+import android.content.Context
+import com.crys.codingtask.R
 import com.crys.codingtask.model.CurrencyRecyclerViewItem
 import com.crys.codingtask.data.model.Rates
+import timber.log.Timber
 import kotlin.math.roundToInt
 
 
@@ -200,5 +203,22 @@ object Converter {
     //round double to 5 digits
     fun roundCurrency(number: Double) : Double {
         return (number * 100000.0).roundToInt() / 100000.0
+    }
+
+    //date we become yyyy-mm-dd
+    fun stringToDate(date: String, context: Context) : String {
+        //if length is valid
+        return if (date.length == 10) {
+            try {
+                val month = date.subSequence(5, 7).toString().toInt()
+                val monthsArray = context.resources.getStringArray(R.array.months)
+                "${date.subSequence(8, 10)} ${monthsArray[month - 1]} ${
+                    date.subSequence(0, 4)}"
+            } catch (e: Exception) {
+                date
+            }
+        } else {
+            date
+        }
     }
 }

@@ -34,7 +34,8 @@ class CurrencyItemAdapter(val context: Context) : RecyclerView.Adapter<CurrencyR
                     LayoutInflater.from(parent.context),
                     parent,
                     false
-                )
+                ),
+                context
             )
             else -> throw IllegalArgumentException("Invalid ViewType Provided")
         }

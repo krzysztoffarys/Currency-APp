@@ -34,7 +34,7 @@ class DefaultRepository @Inject constructor(
 
     //the function to return the latest response, if the response is not successful or the body is empty, returns error
     override suspend fun getLatestResponse(): Resource<LatestResponse> {
-        return responseTest
+        //return responseTest
         val response = api.getLatest()
         if (response.isSuccessful) {
             response.body()?.let { result ->
@@ -47,7 +47,7 @@ class DefaultRepository @Inject constructor(
 
     //the function to return the response at selected day, if the response is not successful or the body is empty, returns error
     override suspend fun getSelectedDateResponse(date: String): Resource<SelectedDateResponse> {
-        return responseTest2
+        //return responseTest2
         val response = api.getHistorical(date = date)
         if (response.isSuccessful) {
             response.body()?.let { result ->
