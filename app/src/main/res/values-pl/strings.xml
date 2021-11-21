@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CodingTask</string>
+    <string name="change_currency">Zamień walutę</string>
+    <string name="convert">Zamień</string>
+    <string name="empty_field">Pole jest puste</string>
+    <string name="exit">Wyjście</string>
+    <string name="amount">ilość</string>
+    <string name="from">Z</string>
+    <string name="to">Na</string>
+    <string name="reload">Załaduj ponownie</string>
+
+    <string-array name="months">
+        <item>Stycznia</item>
+        <item>Lutego</item>
+        <item>Marca</item>
+        <item>Kwietnia</item>
+        <item>Maja</item>
+        <item>Czerwca</item>
+        <item>Lipca</item>
+        <item>Sierpnia</item>
+        <item>Września</item>
+        <item>Października</item>
+        <item>Listopada</item>
+        <item>Grudnia</item>
+    </string-array>
+</resources>

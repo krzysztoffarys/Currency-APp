@@ -47,9 +47,7 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
         binding.apply {
             tvInfo.text = stringToDate(date, requireContext())
             ivCross.setOnClickListener {
-                findNavController().navigate(
-                    DetailFragmentDirections.actionDetailFragmentToRateFragment()
-                )
+                findNavController().popBackStack()
             }
 
             ivChange.setOnClickListener {

@@ -17,13 +17,12 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
 @HiltViewModel
 class RateViewModel @Inject constructor(
     private val repository: Repository
 ): ViewModel() {
-
+    var wasLatestResponse = false
     private val _result = MutableLiveData<Event<Resource<List<CurrencyRecyclerViewItem>>>>()
     val result : LiveData<Event<Resource<List<CurrencyRecyclerViewItem>>>> = _result
 
