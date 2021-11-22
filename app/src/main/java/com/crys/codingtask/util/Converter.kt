@@ -1,10 +1,7 @@
-package com.crys.codingtask.other
+package com.crys.codingtask.util
 
-import android.content.Context
-import com.crys.codingtask.R
-import com.crys.codingtask.model.CurrencyRecyclerViewItem
 import com.crys.codingtask.data.model.Rates
-import timber.log.Timber
+import com.crys.codingtask.model.CurrencyRecyclerViewItem
 import kotlin.math.roundToInt
 
 
@@ -205,15 +202,19 @@ object Converter {
         return (number * 100000.0).roundToInt() / 100000.0
     }
 
-    //date we become yyyy-mm-dd
-    fun stringToDate(date: String, context: Context) : String {
-        //if length is valid
-        return if (date.length == 10) {
+    //we convert 2021-01-01 to 01 january 2021
+    fun stringToDate(date: String, monthsArray: Array<String>) : String {
+        //if length is valid and format
+        return if (date.length == 10 && date[4] == '-' && date[7] == '-') {
             try {
                 val month = date.subSequence(5, 7).toString().toInt()
-                val monthsArray = context.resources.getStringArray(R.array.months)
-                "${date.subSequence(8, 10)} ${monthsArray[month - 1]} ${
-                    date.subSequence(0, 4)}"
+                if (monthsArray.size > month) {
+                    "${date.subSequence(8, 10)} ${monthsArray[month - 1]} ${
+                        date.subSequence(0, 4)}"
+                } else {
+                    date
+                }
+
             } catch (e: Exception) {
                 date
             }

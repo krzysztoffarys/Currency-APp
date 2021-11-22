@@ -9,6 +9,8 @@
     <string name="from">Z</string>
     <string name="to">Na</string>
     <string name="reload">Załaduj ponownie</string>
+    <string name="no_connection">Brak połączenia z internetem</string>
+    <string name="unknown_error">Wystąpił nieznany błąd</string>
 
     <string-array name="months">
         <item>Stycznia</item>

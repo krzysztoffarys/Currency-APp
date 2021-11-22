@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.crys.codingtask.R
 import com.crys.codingtask.model.CustomSpinnerItem
-import com.crys.codingtask.other.Converter.popularCurrency
-import com.crys.codingtask.other.Converter.roundCurrency
+import com.crys.codingtask.util.Converter.popularCurrency
+import com.crys.codingtask.util.Converter.roundCurrency
 
 class DetailViewModel : ViewModel() {
 
@@ -34,10 +34,8 @@ class DetailViewModel : ViewModel() {
     private lateinit var item: CustomSpinnerItem
     var isRightMainSpinner = true
 
-    //when the item we selected is one of our main currency, then we add gbp to the spinner item list
     fun addToList(item: CustomSpinnerItem) {
         this.item = item
-
     }
 
     fun provideList(isMain: Boolean) : List<CustomSpinnerItem> {
@@ -50,10 +48,12 @@ class DetailViewModel : ViewModel() {
     }
 
     fun calculate(number: Double) {
+        //if we convert to
         if (isRightMainSpinner) {
             val result = number * currencyRates[selectedSpinnerItem]
             _result.postValue("$number ${item.name} = ${roundCurrency(result)} ${list[selectedSpinnerItem].name}")
         } else {
+            //if we convert from
             if (currencyRates[selectedSpinnerItem] == 0.0) {
                 return
             }
@@ -62,6 +62,7 @@ class DetailViewModel : ViewModel() {
         }
     }
 
+    //preparing the currency
     fun getCurrency(date: String, cur: Double) {
         for (i in popularCurrency) {
             if (i.date == date) {

@@ -5,10 +5,12 @@ import com.crys.codingtask.data.model.LatestResponse
 import com.crys.codingtask.data.model.Rates
 import com.crys.codingtask.data.model.SelectedDateResponse
 import com.crys.codingtask.other.Resource
+import com.crys.codingtask.util.InfoProvider
 import javax.inject.Inject
 
 class DefaultRepository @Inject constructor(
-    private val api: CurrencyApi
+    private val api: CurrencyApi,
+    private val infoProvider: InfoProvider
 ) : Repository {
 
     private var responseTest = Resource.success(
@@ -34,7 +36,10 @@ class DefaultRepository @Inject constructor(
 
     //the function to return the latest response, if the response is not successful or the body is empty, returns error
     override suspend fun getLatestResponse(): Resource<LatestResponse> {
-        return responseTest
+        if (!infoProvider.isOnline()) {
+            return Resource.error(infoProvider.getString("no_connection"), null)
+        }
+        //return responseTest
         val response = api.getLatest()
         if (response.isSuccessful) {
             response.body()?.let { result ->
@@ -47,7 +52,10 @@ class DefaultRepository @Inject constructor(
 
     //the function to return the response at selected day, if the response is not successful or the body is empty, returns error
     override suspend fun getSelectedDateResponse(date: String): Resource<SelectedDateResponse> {
-        return responseTest2
+        if (!infoProvider.isOnline()) {
+            return Resource.error(infoProvider.getString("no_connection"), null)
+        }
+        //return responseTest2
         val response = api.getHistorical(date = date)
         if (response.isSuccessful) {
             response.body()?.let { result ->

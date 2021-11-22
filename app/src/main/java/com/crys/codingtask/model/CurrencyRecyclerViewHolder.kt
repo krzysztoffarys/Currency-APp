@@ -6,8 +6,8 @@ import androidx.viewbinding.ViewBinding
 import com.crys.codingtask.R
 import com.crys.codingtask.databinding.ItemCurrencyBinding
 import com.crys.codingtask.databinding.ItemDateBinding
-import com.crys.codingtask.other.Converter.roundCurrency
-import com.crys.codingtask.other.Converter.stringToDate
+import com.crys.codingtask.util.Converter.roundCurrency
+import com.crys.codingtask.util.Converter.stringToDate
 
 sealed class CurrencyRecyclerViewHolder(binding: ViewBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -45,7 +45,7 @@ sealed class CurrencyRecyclerViewHolder(binding: ViewBinding) : RecyclerView.Vie
 
     class DateViewHolder(private val binding: ItemDateBinding, private val context: Context) : CurrencyRecyclerViewHolder(binding){
         fun bind(date: CurrencyRecyclerViewItem.Date) {
-            binding.tvDate.text = stringToDate(date.date, context)
+            binding.tvDate.text = stringToDate(date.date, context.resources.getStringArray(R.array.months))
         }
     }
 

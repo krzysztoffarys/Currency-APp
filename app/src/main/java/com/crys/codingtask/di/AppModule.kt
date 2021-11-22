@@ -1,7 +1,9 @@
 package com.crys.codingtask.di
 
+import android.content.Context
 import com.crys.codingtask.data.CurrencyApi
 import com.crys.codingtask.other.Constants.BASE_URL
+import com.crys.codingtask.util.InfoProvider
 import com.crys.codingtask.repositories.DefaultRepository
 import com.crys.codingtask.repositories.Repository
 import com.squareup.moshi.Moshi
@@ -9,6 +11,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -48,10 +51,17 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideDefaultRepository(
-        api: CurrencyApi
-    ) = DefaultRepository(api) as Repository
+    fun provideInfoProvider(
+        @ApplicationContext
+        context: Context
+    ) = InfoProvider(context)
 
+    @Provides
+    @Singleton
+    fun provideDefaultRepository(
+        api: CurrencyApi,
+        infoProvider: InfoProvider
+    ) = DefaultRepository(api, infoProvider) as Repository
 }
 
 

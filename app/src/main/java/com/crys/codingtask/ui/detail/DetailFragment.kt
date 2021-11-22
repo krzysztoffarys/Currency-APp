@@ -1,8 +1,8 @@
 package com.crys.codingtask.ui.detail
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.view.View
+import android.view.animation.AnimationUtils
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -13,8 +13,7 @@ import com.crys.codingtask.R
 import com.crys.codingtask.adapters.CustomSpinnerAdapter
 import com.crys.codingtask.databinding.DetailFragmentBinding
 import com.crys.codingtask.model.CustomSpinnerItem
-import com.crys.codingtask.other.Constants.ANIMATION_DURATION_SPINNER
-import com.crys.codingtask.other.Converter.stringToDate
+import com.crys.codingtask.util.Converter.stringToDate
 
 class DetailFragment : Fragment(R.layout.detail_fragment) {
 
@@ -46,8 +45,10 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
         currencyName = args.currency.name.uppercase()
         amount = args.currency.amount
         date = args.currency.date
+
         binding.apply {
-            tvInfo.text = stringToDate(date, requireContext())
+            tvDate.text = stringToDate(date, requireContext().resources.getStringArray(R.array.months))
+            //return back
             ivCross.setOnClickListener {
                 findNavController().popBackStack()
             }
@@ -72,11 +73,13 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
 
         }
         setupSpinner()
+        //setup the view model
         viewModel.getCurrency(date, amount)
         viewModel.calculate(1.0)
     }
     private fun setupSpinner() {
 
+        //prepare the spinner item for current currency
         val placeholder = requireContext().resources.getIdentifier("placeholder_flag",
             "drawable", requireContext().packageName)
         try {
@@ -93,7 +96,7 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
 
 
         binding.spinnerLeft.apply {
-            //current currency on top
+            //only one item, current currency on top
             customAdapterLeft = CustomSpinnerAdapter(requireContext(), viewModel.provideList(false))
             adapter = customAdapterLeft
 
@@ -121,6 +124,7 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
         }
 
         binding.spinnerRight.apply {
+            //list of popular currencies
             customAdapterRight = CustomSpinnerAdapter(requireContext(), viewModel.provideList(true))
             adapter = customAdapterRight
             onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -146,7 +150,6 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
 
         }
     }
-
     private fun swapSpinner() {
         rotate()
         if (viewModel.isRightMainSpinner) {
@@ -163,9 +166,8 @@ class DetailFragment : Fragment(R.layout.detail_fragment) {
     }
 
     private fun rotate() {
-        ObjectAnimator.ofFloat(binding.ivChange, "rotationY", 0F, 180F)
-            .setDuration(ANIMATION_DURATION_SPINNER)
-            .start()
+        val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.rotate)
+        binding.ivChange.startAnimation(anim)
     }
 
 }

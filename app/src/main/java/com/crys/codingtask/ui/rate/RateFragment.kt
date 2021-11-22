@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,9 +13,12 @@ import com.crys.codingtask.R
 import com.crys.codingtask.adapters.CurrencyItemAdapter
 import com.crys.codingtask.databinding.RateFragmentBinding
 import com.crys.codingtask.other.Constants.AMOUNT_ITEM_TO_PAGINATION
+import com.crys.codingtask.other.Constants.NEXT_PAGINATION_TRY
 import com.crys.codingtask.other.Status
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @AndroidEntryPoint
@@ -24,9 +28,7 @@ class RateFragment : Fragment(R.layout.rate_fragment) {
     private val viewModel: RateViewModel by viewModels()
     private lateinit var currencyAdapter: CurrencyItemAdapter
 
-    //variables for pagination
-    private var isLoading = false
-    private var itemAmount = 0
+
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,11 +36,12 @@ class RateFragment : Fragment(R.layout.rate_fragment) {
         binding = RateFragmentBinding.bind(view)
         //if we come back from detail_fragment it should not load again
         //it should get the latest response, only if was some error or it is the first try
-        if (!viewModel.wasLatestResponse) {
+        if (!viewModel.wasAnySuccessfulResponse) {
             viewModel.getLatestResponse()
         }
         subscribeToObservers()
         setupRecyclerView()
+        //navigate to detail fragment with anim
         currencyAdapter.setOnItemClickListener {
             val navOptions =  NavOptions.Builder()
                 .setEnterAnim(R.anim.slide_in_right)
@@ -51,7 +54,7 @@ class RateFragment : Fragment(R.layout.rate_fragment) {
                 navOptions
             )
         }
-
+        //the button is only visible, if it was no successful response, then we can manually try to load again
         binding.btnReload.apply {
             setOnClickListener {
                 if (visibility == View.VISIBLE) {
@@ -65,33 +68,44 @@ class RateFragment : Fragment(R.layout.rate_fragment) {
     //
     private fun subscribeToObservers() {
         viewModel.result.observe(viewLifecycleOwner, { event ->
+            //we use the event class to prevent the same message from being displayed twice when turning the screen
             val result = event.peekContent()
             when(result.status) {
                 Status.SUCCESS -> {
-                    //if is the first successful loading
-                    if (!viewModel.wasLatestResponse) {
+                    //if is the first successful loading the animation needs to start manually
+                    if (!viewModel.wasAnySuccessfulResponse) {
                         binding.rv.startLayoutAnimation()
                     }
-                    isLoading = false
+                    viewModel.isLoading = false
                     binding.progressBar.visibility = View.GONE
                     binding.btnReload.visibility = View.GONE
                     currencyAdapter.items = result.data!!
-                    //we tell the adapter to ui update
-                    currencyAdapter.notifyItemRangeChanged(itemAmount, result.data.size - 1)
-                    itemAmount = result.data.size
-                    viewModel.wasLatestResponse = true
+                    //we tell the adapter to update ui
+                    currencyAdapter.notifyItemRangeChanged(viewModel.itemAmount, result.data.size - 1)
+                    viewModel.itemAmount = result.data.size
+                    //if we have a successful response
+                    viewModel.wasAnySuccessfulResponse = true
                 }
                 Status.ERROR -> {
-                    //if was an error for latest response
-                    if (!viewModel.wasLatestResponse) {
+                    //if was no successful response
+                    if (!viewModel.wasAnySuccessfulResponse) {
                         binding.btnReload.visibility = View.VISIBLE
+                    } else {
+                        //if is problem with pagination
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            delay(NEXT_PAGINATION_TRY)
+                            viewModel.isLoading = false
+                        }
+
                     }
-                    isLoading = false
+
+
                     binding.progressBar.visibility = View.GONE
+                    //we show the error
                     event.getContentIfNotHandled()?.message?.let { message -> showSnackBar(message) }
                 }
                 Status.LOADING -> {
-                    isLoading = true
+                    viewModel.isLoading = true
                     binding.progressBar.visibility = View.VISIBLE
                     binding.btnReload.visibility = View.GONE
                 }
@@ -121,9 +135,8 @@ class RateFragment : Fragment(R.layout.rate_fragment) {
             val layoutManager = recyclerView.layoutManager as LinearLayoutManager
             val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
             val totalItemCount = layoutManager.itemCount
-            if (totalItemCount - firstVisibleItemPosition < AMOUNT_ITEM_TO_PAGINATION && !isLoading) {
-                isLoading = true
-                viewModel.selectedDateResponse()
+            if (totalItemCount - firstVisibleItemPosition < AMOUNT_ITEM_TO_PAGINATION && !viewModel.isLoading) {
+                viewModel.pagination()
             }
         }
     }

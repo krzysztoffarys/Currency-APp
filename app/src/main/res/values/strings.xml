@@ -7,7 +7,10 @@
     <string name="amount">amount</string>
     <string name="from">From</string>
     <string name="to">To</string>
-    <string name="reload">reload</string>
+    <string name="reload">Reload</string>
+    <string name="no_connection">No Internet Connection</string>
+    <string name="unknown_error">An unknown error occurred</string>
+
 
     <string-array name="months">
         <item>January</item>
