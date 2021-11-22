@@ -1,11 +1,9 @@
-package com.crys.codingtask.repositoreis
+package com.crys.codingtask.repositories
 
 import com.crys.codingtask.data.model.LatestResponse
 import com.crys.codingtask.data.model.Rates
 import com.crys.codingtask.data.model.SelectedDateResponse
 import com.crys.codingtask.other.Resource
-import com.crys.codingtask.repositories.Repository
-import timber.log.Timber
 
 class FakeRepository : Repository {
 

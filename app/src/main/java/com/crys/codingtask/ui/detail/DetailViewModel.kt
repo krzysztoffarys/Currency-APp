@@ -7,6 +7,7 @@ import com.crys.codingtask.R
 import com.crys.codingtask.model.CustomSpinnerItem
 import com.crys.codingtask.util.Converter.popularCurrency
 import com.crys.codingtask.util.Converter.roundCurrency
+import timber.log.Timber
 
 class DetailViewModel : ViewModel() {
 

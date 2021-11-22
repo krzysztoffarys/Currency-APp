@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.crys.codingtask.MainCoroutineRule
 import com.crys.codingtask.getOrAwaitValueTest
 import com.crys.codingtask.other.Status
-import com.crys.codingtask.repositoreis.FakeRepository
+import com.crys.codingtask.repositories.FakeRepository
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
